@@ -1,72 +1,81 @@
-const counterDiv = document.querySelector('#counter');
-const minusButton = document.querySelector('#minus');
+const counterText = document.querySelector('#counter');
 const plusButton = document.querySelector('#plus');
+const minusButton = document.querySelector('#minus');
 const heartButton = document.querySelector('#heart');
-const pauseButton = document.querySelector('#pause');
-const likesList = document.querySelector('.likes');
+const likesList = document.querySelector('#likes');
 
-let counterNumber = 0;
-let numbersThatHaveLikes = [];
+
+let counter = 0;
+let itemsLiked = [];
+
 
 const displayCounter = () => {
-  counterDiv.innerHTML = counterNumber;
+  counterText.innerHTML = counter;
 }
 
-const timer = () => {
-  const intervalId = setInterval(() => {
-    counterNumber++;
+const setTimer = () => {
+  const interval = setInterval(() => {
+    counter++;
     displayCounter();
   }, 1000);
-  return;
-}
-
-const isUnique = (array) => {
-  const uniqueItemsLiked = [array[0]];
-  let currentItem = array[0];
-
-  for(item of array) {
-    if(item !== currentItem) {
-      uniqueItemsLiked.push(item);
-      currentItem = item;
-    } else {
-      currentItem = item;
-    }
-  }
-}
-
-const displayLikes = () => {
-  let html = '';
-
-  const uniqueItems = isUnique(numbersThatHaveLikes);
-
-  for(item of uniqueItems) {
-    const howManyLikes = numbersThatHaveLikes.filter((number) => item == number);
-
-    if(howManyLikes.length > 1) {
-      html = html + `<li>${item} was liked ${howManyLikes.length} times.`;
-    } else {
-      html = html + `<li>${item} was liked.`;
-    }
-  }
-
-  likesList.innerHTML = html;
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  timer();  
+  setTimer();
 });
 
 plusButton.addEventListener('click', () => {
-  counterNumber++;
+  counter++;
   displayCounter();
-})
+});
 
 minusButton.addEventListener('click', () => {
-  counterNumber--;
+  counter--;
   displayCounter();
-})
+});
+
+
+const createHtml = (item, numberOfLikes) => {
+  return `<li>${item} was liked ${numberOfLikes} times</li>`;
+}
+
+const findUnique = () => {
+  let uniqueItemsLiked = [];
+
+  let compareCurrentNumber = itemsLiked[0];
+
+  for(item of itemsLiked) {
+    if(item !== compareCurrentNumber) {
+      uniqueItemsLiked.push(item);
+      compareCurrentNumber = itemsLiked[item];
+    } else {
+      compareCurrentNumber = itemsLiked[item];
+    }
+  }
+
+  return uniqueItemsLiked;
+}
+
+const numberOfLikes = (item) => {
+  const newArray = itemsLiked.filter(number => number === item);
+
+  return newArray.length;
+}
+
+const renderLikesList = () => {
+  let htmlString = '';
+  const uniqueNumbersArray = findUnique();
+
+  for(item of uniqueNumbersArray) {
+    const timesLiked = numberOfLikes(itemsLiked);
+    htmlString = htmlString + createHtml(item, timesLiked);
+  }
+
+  likesList.innerHTML = htmlString;
+}
 
 heartButton.addEventListener('click', () => {
-  numbersThatHaveLikes.push(counterNumber);
-  displayLikes();
+  itemsLiked.push(counter);
+  renderLikesList();
+  // display how many times a number was liked 
 })
